@@ -47,5 +47,5 @@ def better_coins(candles, minutesa):
 
 coins = better_coins(candles, minutesa)
 #playsound('C:\\Windows\\Media\\notify.wav')
-coins.ret.nlargest(20)
-coins.ret.nsmallest(20)
+print(coins.ret.nlargest(20))
+print(coins.ret.nsmallest(20))
