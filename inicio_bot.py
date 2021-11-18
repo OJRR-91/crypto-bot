@@ -9,10 +9,12 @@ import datetime
 import numpy as np
 import pandas as pd
 
-client = Client(config_acc.API_KEY, config_acc.API_SECRET)
+#conexion API binance
+client = Client()
 
-symbol = "BTCUSDT"
-candles = 15
+#Datos de la crypto
+symbol = "BTCUSDT"                                              #CRYPTO/BUSD
+candles = 15                                                    #VELAS tiempo
 minutesa = candles*300
 candle = str(candles)+"m"
 minutes = str(minutesa) + " min ago UTC"
@@ -34,9 +36,9 @@ macd = btalib.macd(btc_df.close, pfast=12, pslow=26, psignal=9)
 #btc_df = btc_df.join([rsi.df, macd.df])
 print(btc_df.tail())
 
+#Indicadores
 btc_df["rsi_ta"] = ta.momentum.rsi(btc_df.close, window = 14)
-
-
 btc_df['20sma'] = btc_df.close.rolling(20).mean()
-print(btc_df.tail(5))
 
+
+print(btc_df.tail(5))
