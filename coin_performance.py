@@ -18,6 +18,7 @@ minutes = str(minutesa) + " min ago UTC"
 candle,minutes
 
 
+
 def better_coins(candles, minutesa):
     candle = str(candles)+"h"
     minutes = str(minutesa) + " hours ago UTC"
@@ -45,6 +46,6 @@ def better_coins(candles, minutesa):
 
 
 coins = better_coins(candles, minutesa)
-playsound('C:\\Windows\\Media\\notify.wav')
+#playsound('C:\\Windows\\Media\\notify.wav')
 coins.ret.nlargest(20)
 coins.ret.nsmallest(20)
