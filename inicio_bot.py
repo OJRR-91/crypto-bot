@@ -13,7 +13,7 @@ import pandas as pd
 client = Client()
 
 #Datos de la crypto
-symbol = "SHIBBUSD"                                              #CRYPTO/BUSD
+symbol = "SHIBBUSD"                                             #CRYPTO/BUSD
 candles, candlet = 15, "m"                                      #VELAS tiempo 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
 minutesa = candles*300                                          #Cuantas velas atras quieres analizar
 candle = str(candles) + candlet                                 #Entrada get_historical_klines 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
@@ -27,6 +27,7 @@ for line in bars:
 btc_df = pd.DataFrame(bars, columns=['date', 'open', 'high', 'low', 'close'])
 btc_df.set_index('date', inplace=True)
 btc_df.index = pd.to_datetime(btc_df.index, unit='ms')
+btc_df.index = btc_df.index.tz_localize('UTC').tz_convert('America/Mexico_City')
 btc_df = btc_df.astype(float)
 print(btc_df.head())
 
