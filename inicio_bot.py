@@ -27,7 +27,7 @@ for line in bars:
 btc_df = pd.DataFrame(bars, columns=['date', 'open', 'high', 'low', 'close'])
 btc_df.set_index('date', inplace=True)
 btc_df.index = pd.to_datetime(btc_df.index, unit='ms')
-btc_df.index = btc_df.index.tz_localize('UTC').tz_convert('America/Mexico_City')
+btc_df.index = btc_df.index.tz_localize('UTC').tz_convert('America/Mexico_City')    #Cambio de zona horaria
 btc_df = btc_df.astype(float)
 print(btc_df.head())
 
