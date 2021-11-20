@@ -50,7 +50,7 @@ for i in range(-10,-1,1): #ultimas 8 velas + valor actual
     btc_df.iloc[i]["histogram"]
     if btc_df.iloc[i]["histogram"] < 0:
         MACD_COUNT += 1
-        if MACD_COUNT > 5:
+        if MACD_COUNT > 6:
             ALERTA_MACD = True
     else:# btc_df.iloc[i]["histogram"] > 0:
         MACD_COUNT = 0
@@ -65,11 +65,14 @@ for i in range(0, len(btc_df)):
     if btc_df.iloc[i]["histogram"] < 0:
         MACD_COUNT += 1
         btc_df.iat[i,7] = "Possible"
-        if MACD_COUNT > 5:
+        if MACD_COUNT > 6:
             ALERTA_MACD = True
             btc_df.iat[i,7] = "TRUE"
     else:# btc_df.iloc[i]["histogram"] > 0:
         MACD_COUNT = 0
 
-print("DEBUG")
-print(btc_df[btc_df["MACDC_ALERT"] == "TRUE"])
+#print("DEBUG")
+#print(btc_df[btc_df["MACDC_ALERT"] == "TRUE"])
+pd.set_option('display.max_column', 6)              #Para ver la tabla completa
+pd.set_option('display.max_rows', None)             #Para ver la tabla completa
+print(btc_df)
