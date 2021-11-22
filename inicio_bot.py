@@ -1,9 +1,7 @@
-import sys
+import sys, btalib
 sys.path.append(r"C:\Python37\Scripts")
 from binance.client import Client
 from binance.enums import *
-import btalib
-import numpy as np
 import pandas as pd
 
 #Conexion API binance
@@ -28,6 +26,7 @@ btc_df = btc_df.astype(float)
 
 #########################################################################################
 #########################################################################################
+
 #Indicadores
 
 #MACD
@@ -40,6 +39,7 @@ btc_df = btc_df.join([bollinger.df])
 
 #########################################################################################
 #########################################################################################
+
 #Debug
 
 #print(btc_df.head())
@@ -55,18 +55,19 @@ btc_df = btc_df.join([bollinger.df])
 
 #########################################################################################
 #########################################################################################
+
 #Activa señal del MACD, si obtiene mas de cinco velas rojas se activa, TIEMPO REAL!
 
-ALERTA_MACD = False
-MACD_COUNT = 0
-for i in range(-10,-1,1): #ultimas 8 velas + valor actual 
-    btc_df.iloc[i]["histogram"]
-    if btc_df.iloc[i]["histogram"] < 0:
-        MACD_COUNT += 1
-        if MACD_COUNT > 6:
-            ALERTA_MACD = True
-    else:# btc_df.iloc[i]["histogram"] > 0:
-        MACD_COUNT = 0
+# ALERTA_MACD = False
+# MACD_COUNT = 0
+# for i in range(-10,-1,1): #ultimas 8 velas + valor actual 
+#     btc_df.iloc[i]["histogram"]
+#     if btc_df.iloc[i]["histogram"] < 0:
+#         MACD_COUNT += 1
+#         if MACD_COUNT > 6:
+#             ALERTA_MACD = True
+#     else:# btc_df.iloc[i]["histogram"] > 0:
+#         MACD_COUNT = 0
 
 #BACK TESTING DE ALERTA MACD
 #Activa señal del MACD, si obtiene mas de cinco velas rojas se activa, BACKTESTING
@@ -86,6 +87,7 @@ for i in range(0, len(btc_df)):
 
 #########################################################################################
 #########################################################################################
+
 #Alerta Bollinger
 
 #BACK TESTING DE ALERTA Bollinger
@@ -98,11 +100,43 @@ for i in range(0, len(btc_df)):
 
 #########################################################################################
 #########################################################################################
+
+#Alerta Bollinger
+
+#BACK TESTING DE ALERTA Bollinger
+#Activa señal del Bollinger, se activa al bajar el precio mas del 0.4% por debajo de la banda low , BACKTESTING
+#ALERTA_BB = False
+
+btc_df['BB_ALERT'] = "NaN"
+btc_df['COMPRAS'] = "NaN"
+btc_df['VENTAS'] = "NaN"
+compra_active = False
+compra = 0
+for i in range(0, len(btc_df)):
+    if not compra_active:
+        if btc_df.iloc[i]["MACD_ALERT"] == "TRUE":
+            if btc_df.iloc[i]["bot"]*0.996 > btc_df.iloc[i]["low"]:     #Debajo de 0.4% Activa la señal y compra
+                btc_df.iat[i,11] = "TRUE"                       #[i,11]BB_ALERT
+                btc_df.iat[i,12] = "TRUE"                       #[i,12]COMPRAS
+                compra = btc_df.iloc[i]["bot"]*0.996
+                compra_active = True
+                continue
+    if compra_active:
+        venta = compra*1.01 
+        if (btc_df.iloc[i]["close"] > venta) or (btc_df.iloc[i]["open"] > venta) or (btc_df.iloc[i]["low"] > venta) or (btc_df.iloc[i]["high"] > venta):
+            compra_active = False
+            btc_df.iat[i,13] = "TRUE"
+            print (compra,venta)
+        
+#########################################################################################
+#########################################################################################
+
 #DEBUG
 
 #print("DEBUG")
 #print(btc_df[btc_df["MACD_ALERT"] == "TRUE"])
 print(btc_df.loc[(btc_df["MACD_ALERT"] == "TRUE") & (btc_df["BB_ALERT"] == "TRUE")])
+print(btc_df.loc[(btc_df["COMPRAS"] == "TRUE") | (btc_df["VENTAS"] == "TRUE")])
 # btc_df[btc_df["BB_ALERT"] == "TRUE"]
 #pd.set_option('display.max_column', 6)              #Para ver la tabla completa
 #pd.set_option('display.max_rows', None)             #Para ver la tabla completa
