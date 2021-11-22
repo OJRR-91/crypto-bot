@@ -50,13 +50,13 @@ def añadir_indicadores(btc_df):
 def macd_alerta(btc_df):
     ALERTA_MACD = False
     MACD_COUNT = 0
-    for i in range(-10,-1,1): #ultimas 8 velas + valor actual 
+    for i in range(-10,-1,1):                   #ultimas 8 velas + valor actual 
         btc_df.iloc[i]["histogram"]
         if btc_df.iloc[i]["histogram"] < 0:
             MACD_COUNT += 1
             if MACD_COUNT > 6:
                 ALERTA_MACD = True
-        else:# btc_df.iloc[i]["histogram"] > 0:
+        else:                                   # btc_df.iloc[i]["histogram"] > 0:
             MACD_COUNT = 0
             ALERTA_MACD = False
     return ALERTA_MACD
