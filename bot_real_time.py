@@ -143,7 +143,18 @@ def bbands_alert():
 
 
 
+minutos = 5
+cron = 6
 
+while(cron):
+    current_time = time.time()
+    tiempo = time.localtime(current_time)
+    if (tiempo.tm_min == minutos or tiempo.tm_min == (minutos * 2) or tiempo.tm_min == (minutos * 3) or tiempo.tm_min == 00):
+        print(time.ctime(time.time()))
+        time.sleep(10)
+        cron -= 1
+
+        
 
 #########################################################################################
 #########################################################################################
