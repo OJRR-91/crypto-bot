@@ -1,4 +1,4 @@
-import sys, btalib
+import sys, btalib, time
 sys.path.append(r"C:\Python37\Scripts")
 from binance.client import Client
 from binance.enums import *
@@ -69,12 +69,37 @@ def macd_alerta(btc_df):
 def main():
     btc_df = obtener_velas()
     print(btc_df)
+    cron = True
+    while(cron):
+        current_time = time.time()
+        tiempo = time.localtime(current_time)
+        if (tiempo.tm_min == minutos and tiempo.tm_sec <= 1) or (tiempo.tm_min == (minutos * 2) and tiempo.tm_sec <= 1) or (tiempo.tm_min == (minutos * 3) and tiempo.tm_sec <= 1) or (tiempo.tm_min == 00 and tiempo.tm_sec <= 1):
+            #Volver a tomar los datos de las velas
+            print(time.ctime(time.time()))
+            print("closing loop")
+            input()
+            btc_df = obtener_velas()
+            print(btc_df)
+        else:
+            #Realizar chequeo de alertas para comprar
+            print(time.ctime(time.time()))
+            print("cont loop")
+            time.sleep(1)                         #Verificar cada segundo el precio
+            if macd_alerta(btc_df):
+                print("verificar Bolinger")
+                btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
+                bbands_alert(btc_df, btc_price)
+            else:
+                continue
+
     if macd_alerta(btc_df):
         print("verificar Bolinger")
     else:
         print("loopear")    
     btc_price = client.get_symbol_ticker(symbol="BTCUSDT")
     return btc_price
+
+minutos = 15
 
 
 #########################################################################################
@@ -134,12 +159,14 @@ def main():
 #BACK TESTING DE ALERTA Bollinger
 #Activa señal del Bollinger, se activa al bajar el precio mas del 0.4% por debajo de la banda low , BACKTESTING
 #ALERTA_BB = False
-def bbands_alert():
-    btc_price = client.get_symbol_ticker(symbol="BTCUSDT")
+def bbands_alert(btc_df, btc_price):
+    #btc_price = client.get_symbol_ticker(symbol="BTCUSDT")
     btc_df['BB_ALERT'] = "NaN"
     for i in range(0, len(btc_df)):
-        if btc_df.iloc[i]["bot"]*0.996 > btc_df.iloc[i]["low"]:     #Debajo de 0.4% Activa la señal
+        if btc_df.iloc[i]["bot"]*0.996 > float(btc_price["price"]):     #Debajo de 0.4% Activa la señal
             btc_df.iat[i,11] = "TRUE"                       #[i,10]BB_ALERT
+
+
 
 
 
