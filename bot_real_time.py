@@ -67,30 +67,42 @@ def macd_alerta(btc_df):
 
 #Main loop
 def main():
+    print(time.ctime(time.time()))
     btc_df = obtener_velas()
     print(btc_df)
+    print(time.ctime(time.time()))
+    minutos=15
+    compra_activa=False#Agregamos Flag de compra
     cron = True
     while(cron):
         current_time = time.time()
         tiempo = time.localtime(current_time)
-        if (tiempo.tm_min == minutos and tiempo.tm_sec <= 1) or (tiempo.tm_min == (minutos * 2) and tiempo.tm_sec <= 1) or (tiempo.tm_min == (minutos * 3) and tiempo.tm_sec <= 1) or (tiempo.tm_min == 00 and tiempo.tm_sec <= 1):
-            #Volver a tomar los datos de las velas
-            print(time.ctime(time.time()))
-            print("closing loop")
-            input()
-            btc_df = obtener_velas()
-            print(btc_df)
-        else:
-            #Realizar chequeo de alertas para comprar
-            print(time.ctime(time.time()))
-            print("cont loop")
-            time.sleep(1)                         #Verificar cada segundo el precio
+           #Realizar chequeo de alertas para comprar
+        print(time.ctime(time.time()))
+        print("cont loop")
+        btc_df = obtener_velas()
+        btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
+                                        #Verificar cada segundo el precio
+        print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
+        if not compra_activa:
             if macd_alerta(btc_df):
                 print("verificar Bolinger")
+                   #btc_df = obtener_velas()
                 btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
-                bbands_alert(btc_df, btc_price)
-            else:
-                continue
+                if (btc_df.iloc[-1]["bot"]*0.996 > float(btc_price["price"])):
+                    print("Comprar")#Falta crear metodo de compra
+                    print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
+                    compra_activa=True
+                else:
+                    print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
+                    input()
+                    continue
+        elif(compra_activa):
+            print("Venta")#Falta crear metodo de venta
+        else:
+            continue
+
+
 
     if macd_alerta(btc_df):
         print("verificar Bolinger")
