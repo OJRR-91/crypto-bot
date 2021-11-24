@@ -1,4 +1,4 @@
-import sys, btalib, time
+import sys, btalib, time, math
 sys.path.append(r"C:\Python37\Scripts")
 from binance.client import Client
 from binance.enums import *
@@ -70,48 +70,52 @@ def main():
     print(time.ctime(time.time()))
     btc_df = obtener_velas()
     print(btc_df)
-    print(time.ctime(time.time()))
-    minutos=15
-    compra_activa=False#Agregamos Flag de compra
+    #print(time.ctime(time.time()))
+    compra_activa=False         #Agregamos Flag de compra
     cron = True
     while(cron):
-        current_time = time.time()
-        tiempo = time.localtime(current_time)
-           #Realizar chequeo de alertas para comprar
-        print(time.ctime(time.time()))
-        print("cont loop")
+        #Realizar chequeo de alertas para comprar
+        #print(time.ctime(time.time()))
+        #print("cont loop")
         btc_df = obtener_velas()
-        btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
-                                        #Verificar cada segundo el precio
-        print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
-        if not compra_activa:
+        #btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")   #Verificar cada segundo el precio
+        #print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
+        if not compra_activa:           #Compra
             if macd_alerta(btc_df):
-                print("verificar Bolinger")
-                   #btc_df = obtener_velas()
+                #print("MACD -> Bollinger")
+                #btc_df = obtener_velas()
                 btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
-                if (btc_df.iloc[-1]["bot"]*0.996 > float(btc_price["price"])):
-                    print("Comprar")#Falta crear metodo de compra
-                    print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
-                    compra_activa=True
+                precio_actual = float(btc_price["price"])
+                precio_compra = round_down(btc_df.iloc[-1]["bot"]*1.03,8)
+                if (precio_compra > precio_actual):
+                    print("MACD -> Bollinger -> Compra")          #Falta crear metodo de compra
+                    print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio a comprar: {precio_compra}\n")
+                    compra_activa = True
                 else:
-                    print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
-                    input()
+                    print("MACD -> Bollinger") 
+                    print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio a comprar: {precio_compra}\n")
                     continue
-        elif(compra_activa):
-            print("Venta")#Falta crear metodo de venta
+        elif compra_activa:             #Venta
+            print("MACD -> Bollinger -> Compra -> Venta")              #Falta crear metodo de venta
+            btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
+            precio_actual = float(btc_price["price"])
+            precio_venta = precio_compra * 1.01             #Ganancia del 1%
+            print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio a vender: {precio_venta}\n")
+            if (precio_venta < precio_actual):
+                print("Venta completada") 
+                print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio de venta: {precio_venta}\n")
         else:
+            print("MACD")  
+            time.sleep(60)              #esperar 60 segundos
             continue
 
 
 
-    if macd_alerta(btc_df):
-        print("verificar Bolinger")
-    else:
-        print("loopear")    
-    btc_price = client.get_symbol_ticker(symbol="BTCUSDT")
-    return btc_price
+def round_down(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.floor(n * multiplier) / multiplier
 
-minutos = 15
+main()
 
 
 #########################################################################################
@@ -221,8 +225,8 @@ def bbands_alert(btc_df, btc_price):
 
 #print("DEBUG")
 #print(btc_df[btc_df["MACD_ALERT"] == "TRUE"])
-print(btc_df.loc[(btc_df["MACD_ALERT"] == "TRUE") & (btc_df["BB_ALERT"] == "TRUE")])
-print(btc_df.loc[(btc_df["COMPRAS"] == "TRUE") | (btc_df["VENTAS"] == "TRUE")])
+# 
+
 # btc_df[btc_df["BB_ALERT"] == "TRUE"]
 #pd.set_option('display.max_column', 6)              #Para ver la tabla completa
 #pd.set_option('display.max_rows', None)             #Para ver la tabla completa
