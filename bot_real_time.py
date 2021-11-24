@@ -86,15 +86,22 @@ def main():
                 #btc_df = obtener_velas()
                 btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
                 precio_actual = float(btc_price["price"])
-                precio_compra = round_down(btc_df.iloc[-1]["bot"]*1.03,8)
+                precio_compra = round_down(btc_df.iloc[-1]["bot"]*0.996,8)
                 if (precio_compra > precio_actual):
-                    print("MACD -> Bollinger -> Compra")          #Falta crear metodo de compra
+                    print("MACD -> Bollinger -> Compra")          #Falta crear metodo de compra 
                     print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio a comprar: {precio_compra}\n")
                     compra_activa = True
                 else:
                     print("MACD -> Bollinger") 
                     print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio a comprar: {precio_compra}\n")
                     continue
+            else:
+                print("MACD (Velas verdes)")
+                btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
+                precio_actual = float(btc_price["price"])
+                print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\n")
+                time.sleep(60)              #esperar 60 segundos
+                continue
         elif compra_activa:             #Venta
             print("MACD -> Bollinger -> Compra -> Venta")              #Falta crear metodo de venta
             btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
@@ -105,8 +112,7 @@ def main():
                 print("Venta completada") 
                 print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio de venta: {precio_venta}\n")
         else:
-            print("MACD")  
-            time.sleep(60)              #esperar 60 segundos
+            print("Nothing")
             continue
 
 
