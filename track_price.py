@@ -1,3 +1,13 @@
+import numpy as np
+precios =[]
+for i in np.arange(10,1,-0.1):
+    precios.append(i)
+
+
+for i in np.arange(1,7,0.1):
+    precios.append(i)
+
+
 def precio_bajo(precio,precio_anterior):
     if precio < precio_anterior:
         precio_compra_bajo = (precio * 1.01)
