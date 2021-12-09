@@ -1,28 +1,23 @@
-import numpy as np
-precios =[]
-for i in np.arange(10,1,-0.1):
-    precios.append(i)
-
-
-for i in np.arange(1,7,0.1):
-    precios.append(i)
-
-
-def precio_bajo(precio,precio_anterior):
+def precio_bajo(precio,precio_anterior,precio_compra_bajo_anterior):
     if precio < precio_anterior:
-        precio_compra_bajo = (precio * 1.01)
+        precio_compra_bajo = (precio * 1.3)
         return(precio_compra_bajo)
+    else:
+        return(precio_compra_bajo_anterior)
+
 
 def compra_baja(precio, precio_compra_bajo):
-    if precio <= precio_anterior:
+    if precio >= precio_compra_bajo:
         print("Compra", precio)
         return True
 
-precio_anterior,n = 0, 0
+precio_anterior,n,precio_compra_bajo_anterior = 100, 0, 0
 for i in precios:
-    precio_compra_bajo = precio_bajo(i,precio_anterior)
-    #print (precio_compra_bajo)
-    if compra_baja(i, precio_compra_bajo):
+    precio_compra_bajo = precio_bajo(i,precio_anterior, precio_compra_bajo_anterior)
+    precio_compra_bajo_anterior = precio_compra_bajo
+    print (precio_compra_bajo, i)
+    if compra_baja(i, precio_compra_bajo_anterior):
         break
+    print(precio_anterior)
     precio_anterior = i
     n+=1
