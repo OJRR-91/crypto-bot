@@ -1,23 +1,33 @@
-def precio_bajo(precio,precio_anterior,precio_compra_bajo_anterior):
-    if precio < precio_anterior:
-        precio_compra_bajo = (precio * 1.3)
-        return(precio_compra_bajo)
-    else:
-        return(precio_compra_bajo_anterior)
+order_buy = client.create_order(
+    symbol='DOTBUSD',
+    side=SIDE_BUY,
+    type=ORDER_TYPE_LIMIT,
+    timeInForce=TIME_IN_FORCE_GTC,
+    quantity=0.5,
+    price='25')
+    
+    
+    
+order_sell = client.create_order(
+    symbol='DOTBUSD',
+    side=SIDE_SELL,
+    type=ORDER_TYPE_LIMIT,
+    timeInForce=TIME_IN_FORCE_GTC,
+    quantity=0.5,
+    price='48')
+    
+orders = client.get_open_orders(symbol='DOTBUSD')
 
+order_status = client.get_order(
+    symbol='DOTBUSD',
+    orderId=str(orders[0]['orderId']))
 
-def compra_baja(precio, precio_compra_bajo):
-    if precio >= precio_compra_bajo:
-        print("Compra", precio)
-        return True
+result = client.cancel_order(
+    symbol='DOTBUSD',
+    orderId=str(orders[0]['orderId']))
 
-precio_anterior,n,precio_compra_bajo_anterior = 100, 0, 0
-for i in precios:
-    precio_compra_bajo = precio_bajo(i,precio_anterior, precio_compra_bajo_anterior)
-    precio_compra_bajo_anterior = precio_compra_bajo
-    print (precio_compra_bajo, i)
-    if compra_baja(i, precio_compra_bajo_anterior):
-        break
-    print(precio_anterior)
-    precio_anterior = i
-    n+=1
+fees = client.get_trade_fee(symbol='DOTBUSD')
+    
+
+Get all open orders
+orders_allopens = client.get_open_orders(symbol='DOTBUSD')
