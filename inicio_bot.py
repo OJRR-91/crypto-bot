@@ -10,7 +10,7 @@ client = Client()
 #Datos de la crypto
 symbol = "SHIBBUSD"                                             #CRYPTO/BUSD
 candles, candlet = 15, "m"                                      #VELAS tiempo 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
-minutesa = candles*300                                          #Cuantas velas atras quieres analizar
+minutesa = candles*2700                                 #Cuantas velas atras quieres analizar
 candle = str(candles) + candlet                                 #Entrada get_historical_klines 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
 minutes = str(minutesa) + " min ago UTC"                        #Entrada get_historical_klines cuanto tiempo atras
 bars = client.get_historical_klines(symbol,candle,minutes)      #Regresa las velas
@@ -95,7 +95,7 @@ for i in range(0, len(btc_df)):
 #ALERTA_BB = False
 btc_df['BB_ALERT'] = "NaN"
 for i in range(0, len(btc_df)):
-    if btc_df.iloc[i]["bot"]*0.996 > btc_df.iloc[i]["low"]:     #Debajo de 0.4% Activa la señal
+    if btc_df.iloc[i]["bot"]*0.995 > btc_df.iloc[i]["low"]:     #Debajo de 0.4% Activa la señal
         btc_df.iat[i,11] = "TRUE"                       #[i,10]BB_ALERT
 
 #########################################################################################
@@ -115,14 +115,14 @@ compra = 0
 for i in range(0, len(btc_df)):
     if not compra_active:
         if btc_df.iloc[i]["MACD_ALERT"] == "TRUE":
-            if btc_df.iloc[i]["bot"]*0.996 > btc_df.iloc[i]["low"]:     #Debajo de 0.4% Activa la señal y compra
+            if btc_df.iloc[i]["bot"]*0.995 > btc_df.iloc[i]["low"]:     #Debajo de 0.4% Activa la señal y compra
                 btc_df.iat[i,11] = "TRUE"                       #[i,11]BB_ALERT
                 btc_df.iat[i,12] = "TRUE"                       #[i,12]COMPRAS
-                compra = btc_df.iloc[i]["bot"]*0.996
+                compra = btc_df.iloc[i]["bot"]*0.995
                 compra_active = True
                 continue
     if compra_active:
-        venta = compra*1.01 
+        venta = compra*1.01
         if (btc_df.iloc[i]["close"] > venta) or (btc_df.iloc[i]["open"] > venta) or (btc_df.iloc[i]["low"] > venta) or (btc_df.iloc[i]["high"] > venta):
             compra_active = False
             btc_df.iat[i,13] = "TRUE"

@@ -1,5 +1,6 @@
-import sys, btalib, time, math
+import sys, btalib, time, math, logging
 sys.path.append(r"C:\Python37\Scripts")
+import config_acc as api_binance
 from binance.client import Client
 from binance.enums import *
 import pandas as pd
@@ -8,7 +9,7 @@ import pandas as pd
 #########################################################################################
 
 #Conexion API binance
-client = Client()
+client = Client(api_binance.API_KEY, api_binance.API_SECRET)
 
 #Indicadores
 def obtener_velas():
@@ -50,7 +51,7 @@ def añadir_indicadores(btc_df):
 def macd_alerta(btc_df):
     ALERTA_MACD = False
     MACD_COUNT = 0
-    for i in range(-10,-1,1):                   #ultimas 8 velas + valor actual 
+    for i in range(-10,0,1):                   #ultimas 8 velas + valor actual 
         btc_df.iloc[i]["histogram"]
         if btc_df.iloc[i]["histogram"] < 0:
             MACD_COUNT += 1
@@ -69,9 +70,10 @@ def macd_alerta(btc_df):
 def main():
     print(time.ctime(time.time()))
     btc_df = obtener_velas()
-    print(btc_df)
+    print(btc_df.tail(12))
     #print(time.ctime(time.time()))
-    compra_activa=False         #Agregamos Flag de compra
+    compra_activa = False         #Agregamos Flag de compra
+    print(compra_activa)
     cron = True
     while(cron):
         #Realizar chequeo de alertas para comprar
@@ -80,6 +82,7 @@ def main():
         btc_df = obtener_velas()
         #btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")   #Verificar cada segundo el precio
         #print(btc_df.iloc[-1]["bot"]*0.996 , float(btc_price["price"]))
+        time.sleep(0.5)
         if not compra_activa:           #Compra
             if macd_alerta(btc_df):
                 #print("MACD -> Bollinger")
@@ -106,11 +109,12 @@ def main():
             print("MACD -> Bollinger -> Compra -> Venta")              #Falta crear metodo de venta
             btc_price = client.get_symbol_ticker(symbol = "SHIBBUSD")
             precio_actual = float(btc_price["price"])
-            precio_venta = precio_compra * 1.01             #Ganancia del 1%
-            print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio a vender: {precio_venta}\n")
+            precio_venta = round_down((precio_compra * 1.099),8)             #Ganancia del 1%
+            print(f"{time.ctime(time.time())}\nPrecio comprar: {precio_compra}\nPrecio actual: {precio_actual}\nPrecio a vender: {precio_venta}\n")
             if (precio_venta < precio_actual):
                 print("Venta completada") 
-                print(f"{time.ctime(time.time())}\nPrecio actual: {precio_actual}\nPrecio de venta: {precio_venta}\n")
+                print(f"{time.ctime(time.time())}\nPrecio comprar: {precio_compra}\nPrecio actual: {precio_actual}\nPrecio a vender: {precio_venta}\n")
+                compra_activa = False
         else:
             print("Nothing")
             continue
@@ -121,7 +125,11 @@ def round_down(n, decimals=0):
     multiplier = 10 ** decimals
     return math.floor(n * multiplier) / multiplier
 
+
+#sys.stdout = open(r'D:\Python\track_coin.txt', 'w')
 main()
+
+
 
 
 #########################################################################################
@@ -187,10 +195,6 @@ def bbands_alert(btc_df, btc_price):
     for i in range(0, len(btc_df)):
         if btc_df.iloc[i]["bot"]*0.996 > float(btc_price["price"]):     #Debajo de 0.4% Activa la señal
             btc_df.iat[i,11] = "TRUE"                       #[i,10]BB_ALERT
-
-
-
-
 
 
 
